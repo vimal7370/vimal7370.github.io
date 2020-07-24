@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Simple Gen_fsm Example - Technomenace</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title" content="Simple Gen_fsm Example" />
+<meta property="og:description" content="My ongoing journey in the wonderful world of Erlang has been with the help of 2 books. I started off with Learn You Some Erlang For Good which is surely the best beginner guide you can ever get on Erlang language." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.technomenace.com/2015/11/simple-gen_fsm-example/" />
+
+
+
+<meta property="article:published_time" content="2015-11-16T00:57:47&#43;05:30"/>
+
+<meta property="article:modified_time" content="2015-11-16T00:57:47&#43;05:30"/>
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Simple Gen_fsm Example"/>
+<meta name="twitter:description" content="My ongoing journey in the wonderful world of Erlang has been with the help of 2 books. I started off with Learn You Some Erlang For Good which is surely the best beginner guide you can ever get on Erlang language."/>
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,300italic,400italic|Raleway:200,300" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://www.technomenace.com/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://www.technomenace.com/css/main.css" />
+
+	
+	<script src="https://www.technomenace.com/js/main.js"></script>
+</head>
+
+<body>
+	<div class="container wrapper post">
+		<div class="header">
+	<base href="https://www.technomenace.com/">
+	<h1 class="site-title"><a href="https://www.technomenace.com/">Technomenace</a></h1>
+	<div class="site-description"><h2>Linux, technology, opensource etc.</h2><nav class="nav social">
+			<ul class="flat"></ul>
+		</nav>
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/about">About</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post-header">
+			<h1 class="title">Simple Gen_fsm Example</h1>
+			<div class="meta">Posted at &mdash; Nov 16, 2015</div>
+		</div>
+
+		<div class="markdown">
+			<p>My ongoing journey in the wonderful world of Erlang has been with the help of 2 books. I started off with <a href="http://learnyousomeerlang.com/" target="_blank">Learn You Some Erlang For Good</a> which is surely the best beginner guide you can ever get on Erlang language.</p>
+
+<p>This is a rewrite of one of the examples from the above book. The original code is at <a href="http://learnyousomeerlang.com/static/erlang/dog_fsm.erl" target="_blank"><a href="http://learnyousomeerlang.com/static/erlang/dog_fsm.erl">http://learnyousomeerlang.com/static/erlang/dog_fsm.erl</a></a> which we will convert to a module with gen_fsm behaviour.</p>
+
+<p>From <a href="http://learnyousomeerlang.com/finite-state-machines" target="_blank"><a href="http://learnyousomeerlang.com/finite-state-machines">http://learnyousomeerlang.com/finite-state-machines</a></a> :
+<blockquote>A finite-state machine (FSM) is not really a machine, but it does have a finite number of states. I&rsquo;ve always found finite-state machines easier to understand with graphs and diagrams. For example, the following would be a simplistic diagram for a (very dumb) dog as a state machine:</p>
+
+<p><img class="alignnone" src="http://learnyousomeerlang.com/static/img/fsm_dog.png" alt="" width="284" height="161" /></p>
+
+<p>Here the dog has 3 states: sitting, barking or wagging its tail. Different events or inputs may force it to change its state. If a dog is calmly sitting and sees a squirrel, it will start barking and won&rsquo;t stop until you pet it again. However, if the dog is sitting and you pet it, we have no idea what might happen. In the Erlang world, the dog could crash (and eventually be restarted by its supervisor). In the real world that would be a freaky event, but your dog would come back after being ran over by a car, so it&rsquo;s not all bad.</blockquote>
+<strong>NOTE:</strong> I assume that you already know what gen_server is and how it works, since we will be making couple of comparisons with it later.</p>
+
+<p>Let us start with the diagram given above. It is very evident that at any given point in time, our dog will be in one of these states: <strong>sitting</strong> / <strong>barking</strong> / <strong>wagging tail</strong>. For each of these states, gen_fsm callbacks should be exported. The callback function will handle events that occur when our dog is in that particular state.</p>
+
+<p>For example, callback functions sitting/2 (StateName/2) and sitting/3 (StateName/3) handles all events when the dog is &ldquo;sitting&rdquo;. Compared to a gen_server implementation, sitting/2 is same as gen_server&rsquo;s Module:handle_cast/2 and sitting/3 is equal to gen_server&rsquo;s Module:handle_call/3, i.e., sitting/2 contains code to handle events that are called asynchronously, and sitting/3 contains code to handle events that are called synchronously <span style="text-decoration: underline;">when our dog is in sitting state</span>.</p>
+
+<p>In any of the FSM states, an event can be triggered in 2 ways: synchronously (using gen_fsm:sync_send_event/[2,3]), or asynchronously (via gen_fsm:send_event/2). These functions can be related to gen_server:call/[2,3] and gen_server:cast/2 respectively.</p>
+
+<p>Speaking of states, it is important to know that the FSM states we discussed above is different from the &ldquo;State&rdquo; of a gen_server which is used to store data related to that particular process. A FSM process does have the &rdquo;State&rdquo; to facilitate storing of data, but also has another &ldquo;state&rdquo; which indicates whether our dog is currently sitting or barking or wagging its tail. The state information of a running FSM process can be known via sys:get_state/1 function (more on that later).</p>
+
+<p>Coming back to the initial diagram, notice that change in our dog&rsquo;s state happen due to 3 actions: <strong>gets petted</strong> / <strong>sees squirrel</strong> / <strong>wait (timeout)</strong>. The first two are result of external actions, so we export API functions for it, namely pet/0 and squirrel/0. Timeout will be discussed later.</p>
+
+<p>Now, let us start coding dog_fsm.erl:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang">-<span style="color:#cb4b16">module</span>(dog_fsm).
+
+-<span style="color:#cb4b16">behaviour</span>(gen_fsm).
+
+<span style="color:#586e75">%% API
+</span><span style="color:#586e75"></span>-<span style="color:#cb4b16">export</span>([start_link<span style="color:#719e07">/</span><span style="color:#2aa198">0</span>, stop<span style="color:#719e07">/</span><span style="color:#2aa198">0</span>]).
+-<span style="color:#cb4b16">export</span>([squirrel<span style="color:#719e07">/</span><span style="color:#2aa198">0</span>, pet<span style="color:#719e07">/</span><span style="color:#2aa198">0</span>]).
+
+<span style="color:#586e75">%% gen_fsm callbacks
+</span><span style="color:#586e75"></span>-<span style="color:#cb4b16">export</span>([init<span style="color:#719e07">/</span><span style="color:#2aa198">1</span>,
+         barking<span style="color:#719e07">/</span><span style="color:#2aa198">2</span>,
+         wagging_tail<span style="color:#719e07">/</span><span style="color:#2aa198">2</span>,
+         sitting<span style="color:#719e07">/</span><span style="color:#2aa198">2</span>,
+         handle_event<span style="color:#719e07">/</span><span style="color:#2aa198">3</span>,
+         handle_sync_event<span style="color:#719e07">/</span><span style="color:#2aa198">4</span>,
+         handle_info<span style="color:#719e07">/</span><span style="color:#2aa198">3</span>,
+         terminate<span style="color:#719e07">/</span><span style="color:#2aa198">3</span>,
+         code_change<span style="color:#719e07">/</span><span style="color:#2aa198">4</span>]).
+
+-<span style="color:#cb4b16">define</span>(<span style="color:#cb4b16">SERVER</span>, <span style="color:#719e07">?</span><span style="color:#268bd2">MODULE</span>).</code></pre></div>
+<p>Nothing fancy here. We declare our module &ldquo;dog_fsm&rdquo; as an implementation of &ldquo;gen_fsm&rdquo; behaviour. Then we export API calls start_link/0 and stop/0 to &hellip; well, start and stop the FSM. As we discussed above, in order to change our dog&rsquo;s state, we either pet it or show him a squirrel. This functionality will be made available via pet/0 and squirrel/0.</p>
+
+<p>Now let&rsquo;s come to gen_fsm callbacks. The below functions are required for gen_fsm behaviour to work and cannot be left out, so we export them:</p>
+
+<p>init/1, handle_event/3, handle_sync_event/4, handle_info/3, terminate/3, code_change/4.</p>
+
+<p>It is now time to export our states - barking/2, wagging_tail/2 and sitting/2. These functions will handle their state events that are called asynchronously. It means that I will be using gen_fsm:send_event/2 to trigger those events.</p>
+
+<p>NOTE: Had I planned to trigger some events synchronously, I would have also exported barking/3, wagging_tail/3 and sitting/3. And then, instead of using gen_fsm:send_event/2, I would opt for gen_fsm:sync_send_event/[2,3]. We won&rsquo;t be doing any synchronous stuff in this module though, so I have skipped them.</p>
+
+<p>Let&rsquo;s move on and define our API functions now.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#586e75">%%%===================================================================
+</span><span style="color:#586e75">%%% API
+</span><span style="color:#586e75">%%%===================================================================
+</span><span style="color:#586e75"></span>
+<span style="color:#268bd2">start_link</span>() -&gt;
+        <span style="color:#cb4b16">gen_fsm</span>:<span style="color:#268bd2">start_link</span>({local, <span style="color:#719e07">?</span><span style="color:#268bd2">SERVER</span>}, <span style="color:#719e07">?</span><span style="color:#268bd2">MODULE</span>, [], []).
+
+<span style="color:#268bd2">stop</span>() -&gt;
+        <span style="color:#cb4b16">gen_fsm</span>:<span style="color:#268bd2">send_all_state_event</span>(<span style="color:#719e07">?</span><span style="color:#268bd2">SERVER</span>, stop).
+
+<span style="color:#268bd2">squirrel</span>() -&gt;
+        <span style="color:#cb4b16">gen_fsm</span>:<span style="color:#268bd2">send_event</span>(<span style="color:#719e07">?</span><span style="color:#268bd2">SERVER</span>, squirrel).
+
+<span style="color:#268bd2">pet</span>() -&gt;
+        <span style="color:#cb4b16">gen_fsm</span>:<span style="color:#268bd2">send_event</span>(<span style="color:#719e07">?</span><span style="color:#268bd2">SERVER</span>, pet).</code></pre></div>
+<p>start_link/0 calls gen_fsm:start_link/[3,4] which will perform a synchronous call to init/1 (below).</p>
+
+<p>squirrel/0 and pet/0 triggers an event asynchronously (since it calls gen_fsm:send_event/2), and this event is processed based on the current state of the FSM process. For example, if the current dog state is &ldquo;barking&rdquo; and I call pet/0, then the event &lsquo;pet&rsquo; will be sent to barking/2. Likewise, if the dog state was &ldquo;sitting&rdquo; when I called pet/0, then the event &lsquo;pet&rsquo; would have been handled via sitting/2.</p>
+
+<p>stop/0 sends the event &lsquo;stop&rsquo; asynchronously using gen_fsm:send_all_state_event/2. We handle this event using handle_event/3 later.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#586e75">%%%===================================================================
+</span><span style="color:#586e75">%%% gen_fsm callbacks
+</span><span style="color:#586e75">%%%===================================================================
+</span><span style="color:#586e75"></span>
+<span style="color:#268bd2">init</span>([]) -&gt;
+        {<span style="color:#cb4b16">ok</span>, barking, [], <span style="color:#2aa198">0</span>}.</code></pre></div>
+<p>Our init/1 function returns a tuple with the following values to gen_fsm:start_link/[2,3]:</p>
+
+<ul>
+<li><em>ok</em> - Notifies that the process initialization is complete</li>
+<li><em>barking</em> - The initial state of the FSM process. This means that our dog switches to &lsquo;barking&rsquo; state as soon as the process starts, and hence any further events will be handled by barking/2.</li>
+<li><em>[]</em> - State variable. We do not need one in our case. Normally there would be a record defined (like: <em>-record(state, {name, age}).</em> ) that will be initialized here as State variable.</li>
+<li><em>0</em> - Timeout, optional. We set Timeout to 0 deliberately so that a timeout event is passed to barking/2 as soon as the process switches to the &lsquo;barking&rsquo; state. Inside barking/2, we handle the timeout event by printing the dog bark text in a loop (see below).</li>
+</ul>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#268bd2">barking</span>(<span style="color:#268bd2">Event</span>, <span style="color:#268bd2">State</span>) -&gt;
+        <span style="color:#cb4b16">case</span> <span style="color:#268bd2">Event</span> <span style="color:#719e07">of</span>
+                pet -&gt;
+                        <span style="color:#cb4b16">wag</span>(),
+                        {next_state, wagging_tail, <span style="color:#268bd2">State</span>, <span style="color:#2aa198">30000</span>};
+                timeout -&gt;
+                        <span style="color:#cb4b16">bark</span>(),
+                        {next_state, barking, <span style="color:#268bd2">State</span>, <span style="color:#2aa198">2000</span>};
+                _ -&gt;
+                        <span style="color:#cb4b16">io</span>:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Dog is confused</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>),
+                        {next_state, barking, <span style="color:#268bd2">State</span>, <span style="color:#2aa198">0</span>}
+        <span style="color:#719e07">end</span>.</code></pre></div>
+<p>We know that the process switched to &lsquo;barking&rsquo; state during init/1 itself. So all further events will be handled by barking/2 as long as the state remains &lsquo;barking&rsquo;.</p>
+
+<p>As evident from above code snippet, &lsquo;timeout&rsquo; event will call bark/0 (which will print the text &ldquo;Dog says: BARK! BARK!&ldquo;) and then switch to &lsquo;barking&rsquo; state (no major change there since the state was already &lsquo;barking&rsquo;), but also sets timeout value to 2 seconds. This means that &lsquo;timeout&rsquo; event will trigger again within 2 seconds, which in turn will print the text on screen, and this goes on and on until you send in another event (&lsquo;pet&rsquo;, maybe?).</p>
+
+<p>When someone trigger the &lsquo;pet&rsquo; event, wag/0 is called which prints a message to screen and then switches the process state to &lsquo;wagging_tail&rsquo; for the next 30 seconds. Notice that the process state changes from &lsquo;barking&rsquo; to &lsquo;wagging_tail&rsquo; instantly, and the &lsquo;timeout&rsquo; event in &lsquo;wagging_tail&rsquo; state will be triggered after 30 seconds.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#268bd2">wagging_tail</span>(<span style="color:#268bd2">Event</span>, <span style="color:#268bd2">State</span>) -&gt;
+        <span style="color:#cb4b16">case</span> <span style="color:#268bd2">Event</span> <span style="color:#719e07">of</span>
+                pet -&gt;
+                        <span style="color:#cb4b16">sit</span>(),
+                        {next_state, sitting, <span style="color:#268bd2">State</span>};
+                timeout -&gt;
+                        {<span style="color:#cb4b16">next_state</span>, barking, <span style="color:#268bd2">State</span>, <span style="color:#2aa198">0</span>};
+                _ -&gt;
+                        <span style="color:#cb4b16">io</span>:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Dog is confused</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>),
+                        <span style="color:#268bd2">wag</span>(),
+                        {next_state, wagging_tail, <span style="color:#268bd2">State</span>, <span style="color:#2aa198">30000</span>}
+        <span style="color:#719e07">end</span>.</code></pre></div>
+<p>After 30 seconds, the &lsquo;timeout&rsquo; event in &lsquo;wagging_tail&rsquo; state gets triggered, which in turn switches the process back to &lsquo;barking&rsquo; state.</p>
+
+<p>Now let&rsquo;s say that we triggered the &lsquo;pet&rsquo; event in &lsquo;wagging_tail&rsquo; state before it timed out (i.e., call pet/0 within 30 seconds). As you can see from above snippet, sit/0 is then called which just prints out another line of text on screen and then switches the state to &lsquo;sitting&rsquo;. Notice that there is no timeout value mentioned here - which means that the process will wait endlessly for the next event to come its way, and will handle it in sitting/2.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#268bd2">sitting</span>(<span style="color:#268bd2">Event</span>, <span style="color:#268bd2">State</span>) -&gt;
+        <span style="color:#cb4b16">case</span> <span style="color:#268bd2">Event</span> <span style="color:#719e07">of</span>
+                squirrel -&gt;
+                        {<span style="color:#cb4b16">next_state</span>, barking, <span style="color:#268bd2">State</span>, <span style="color:#2aa198">0</span>};
+                _ -&gt;
+                        <span style="color:#cb4b16">io</span>:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Dog is confused</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>),
+                        <span style="color:#268bd2">sit</span>(),
+                        {next_state, sitting, <span style="color:#268bd2">State</span>}
+        <span style="color:#719e07">end</span>.</code></pre></div>
+<p>When our FSM process enters &lsquo;sitting&rsquo; state, the only valid event it will entertain is &lsquo;squirrel&rsquo;. This event can be triggered via squirrel/0 after which the process state switches to &lsquo;barking&rsquo;.</p>
+
+<p>With this we conclude the functions that handle events which are defined up front. Now let us look at some other interesting callbacks.</p>
+
+<p>There are cases when you will want to trigger an event irrespective of the state that our FSM process is currently in. Stoping an FSM process is one classic example. You should be able to stop the process by triggering &lsquo;stop&rsquo; event without caring whether its current state is &lsquo;barking&rsquo; or &lsquo;wagging tail&rsquo; or &lsquo;sitting&rsquo;.</p>
+
+<p>Worry not, because gen_fsm behaviour provides handle_event/3 callback to handle such events in an asynchronous way. Events that we handle via handle_event/3 are triggered via gen_fsm:send_all_state_event/2. If you scroll up and check our stop/0 function, you will notice that we used the same gen_fsm:send_all_state_event/2 to send &lsquo;stop&rsquo; event.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#268bd2">handle_event</span>(stop, _<span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>) -&gt;
+        {<span style="color:#cb4b16">stop</span>, normal, <span style="color:#268bd2">State</span>};
+<span style="color:#268bd2">handle_event</span>(_<span style="color:#268bd2">Event</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>) -&gt;
+        {<span style="color:#cb4b16">next_state</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>}.</code></pre></div>
+<p>FYI, there is another gen_fsm callback named handle_sync_event/4 which can handle events sent to a FSM process synchronously. The events are sent via gen_fsm:sync_send_all_state_event/[2,3] but we will stay away from synchronous calls for our dog FSM.</p>
+
+<p>However, it is necessary to write code for handle_sync_event/4 callback so we do it anyway. All other messages received by the FSM process can be handled using handle_info/3 but we ignore that here. Usual terminate/3 and code_change/4 completes our gen_fsm callback code.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#268bd2">handle_sync_event</span>(_<span style="color:#268bd2">Event</span>, _<span style="color:#268bd2">From</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>) -&gt;
+    R<span style="color:#cb4b16">eply</span> <span style="color:#719e07">=</span> ok,
+    {reply, <span style="color:#268bd2">Reply</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>}.
+
+<span style="color:#268bd2">handle_info</span>(_<span style="color:#268bd2">Info</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>) -&gt;
+    {<span style="color:#cb4b16">next_state</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>}.
+
+<span style="color:#268bd2">terminate</span>(_<span style="color:#268bd2">Reason</span>, _<span style="color:#268bd2">StateName</span>, _<span style="color:#268bd2">State</span>) -&gt;
+    <span style="color:#cb4b16">ok</span>.
+
+<span style="color:#268bd2">code_change</span>(_<span style="color:#268bd2">OldVsn</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>, _<span style="color:#268bd2">Extra</span>) -&gt;
+    {<span style="color:#cb4b16">ok</span>, <span style="color:#268bd2">StateName</span>, <span style="color:#268bd2">State</span>}.</code></pre></div>
+<p>There are a few internal functions which simply prints out the dog action. Internal functions are not exported to the outside world.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang"><span style="color:#586e75">%%%===================================================================
+</span><span style="color:#586e75">%%% Internal functions
+</span><span style="color:#586e75">%%%===================================================================
+</span><span style="color:#586e75"></span><span style="color:#268bd2">bark</span>() -&gt;
+        <span style="color:#cb4b16">io</span>:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Dog says: BARK! BARK!</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>).
+
+<span style="color:#268bd2">wag</span>() -&gt;
+        <span style="color:#cb4b16">io</span>:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Dog wags its tail</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>).
+
+<span style="color:#268bd2">sit</span>() -&gt;
+        <span style="color:#cb4b16">io</span>:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Dog is sitting. Gooooood boy!</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>).</code></pre></div>
+<p>Phew! That completes our example. Let&rsquo;s compile it and take it for a spin. In between we will use sys:get_state/1 to check the current state of our FSM process.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">1&gt; c(dog_fsm).
+{ok,dog_fsm}
+2&gt; dog_fsm:start_link().  
+Dog says: BARK! BARK!
+{ok,&lt;0.41.0&gt;}
+Dog says: BARK! BARK!
+Dog says: BARK! BARK!     
+Dog says: BARK! BARK!     
+3&gt; sys:get_state(dog_fsm).
+{barking,[]}
+Dog says: BARK! BARK!     
+Dog says: BARK! BARK!   
+Dog says: BARK! BARK!  
+4&gt; dog_fsm:pet().
+Dog wags its tail
+ok
+5&gt; sys:get_state(dog_fsm).
+{wagging_tail,[]}
+6&gt; dog_fsm:pet().         
+Dog is sitting. Gooooood boy!
+ok
+7&gt; sys:get_state(dog_fsm).
+{sitting,[]}
+8&gt; dog_fsm:squirrel().    
+Dog says: BARK! BARK!
+ok
+Dog says: BARK! BARK!
+9&gt; sys:get_state(dog_fsm).
+{barking,[]}
+Dog says: BARK! BARK!      
+Dog says: BARK! BARK!  
+10&gt; dog_fsm:pet().
+Dog wags its tail
+ok
+11&gt; %% Wait for 30 seconds
+Dog says: BARK! BARK!
+Dog says: BARK! BARK!
+Dog says: BARK! BARK!
+Dog says: BARK! BARK!
+Dog says: BARK! BARK!      
+Dog says: BARK! BARK!      
+Dog says: BARK! BARK!  
+11&gt; dog_fsm:stop().
+ok</pre></div>
+<p>Further reading:</p>
+
+<ul>
+<li><a href="http://www.erlang.org/doc/design_principles/fsm.html">http://www.erlang.org/doc/design_principles/fsm.html</a></li>
+<li><a href="http://www.erlang.org/doc/man/gen_fsm.html">http://www.erlang.org/doc/man/gen_fsm.html</a></li>
+</ul>
+
+		</div>
+
+		<div class="post-tags">
+			
+				
+					<nav class="nav tags">
+							<ul class="flat">
+								
+								<li><a href="/tags/erlang">erlang</a></li>
+								
+								<li><a href="/tags/gen_fsm">gen_fsm</a></li>
+								
+							</ul>
+					</nav>
+				
+			
+		</div>
+		</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div> <a href="https://github.com/vividvilla/ezhil">Ezhil theme</a> | Built with <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Erlang on Technomenace</title>
+    <link>https://www.technomenace.com/tags/erlang/</link>
+    <description>Recent content in Erlang on Technomenace</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 16 Nov 2015 00:57:47 +0530</lastBuildDate>
+    
+	<atom:link href="https://www.technomenace.com/tags/erlang/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Simple Gen_fsm Example</title>
+      <link>https://www.technomenace.com/2015/11/simple-gen_fsm-example/</link>
+      <pubDate>Mon, 16 Nov 2015 00:57:47 +0530</pubDate>
+      
+      <guid>https://www.technomenace.com/2015/11/simple-gen_fsm-example/</guid>
+      <description>My ongoing journey in the wonderful world of Erlang has been with the help of 2 books. I started off with Learn You Some Erlang For Good which is surely the best beginner guide you can ever get on Erlang language.</description>
+    </item>
+    
+  </channel>
+</rss>

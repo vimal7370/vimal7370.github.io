@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>A Simple Tcp Server in Erlang - Technomenace</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title" content="A Simple Tcp Server in Erlang" />
+<meta property="og:description" content="-module(tcpserver). -export([ start/0, start/1, stop/0 ]). start() -&gt; start(9090). start(Port) -&gt; F = fun() -&gt; register(tcpserver, self()), {ok, LSock} = gen_tcp:listen(Port, [binary]), io:format(&#34;====&gt; TcpServer listening on localhost, port ~p~n~n&#34;, [Port]), spawn(fun() -&gt; loop(LSock) end), receive stop -&gt; exit(killed) end end, Pid = spawn(F)." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.technomenace.com/2016/01/a-simple-tcp-server-in-erlang/" />
+
+
+
+<meta property="article:published_time" content="2016-01-21T00:49:44&#43;05:30"/>
+
+<meta property="article:modified_time" content="2016-01-21T00:49:44&#43;05:30"/>
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="A Simple Tcp Server in Erlang"/>
+<meta name="twitter:description" content="-module(tcpserver). -export([ start/0, start/1, stop/0 ]). start() -&gt; start(9090). start(Port) -&gt; F = fun() -&gt; register(tcpserver, self()), {ok, LSock} = gen_tcp:listen(Port, [binary]), io:format(&#34;====&gt; TcpServer listening on localhost, port ~p~n~n&#34;, [Port]), spawn(fun() -&gt; loop(LSock) end), receive stop -&gt; exit(killed) end end, Pid = spawn(F)."/>
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,300italic,400italic|Raleway:200,300" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://www.technomenace.com/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://www.technomenace.com/css/main.css" />
+
+	
+	<script src="https://www.technomenace.com/js/main.js"></script>
+</head>
+
+<body>
+	<div class="container wrapper post">
+		<div class="header">
+	<base href="https://www.technomenace.com/">
+	<h1 class="site-title"><a href="https://www.technomenace.com/">Technomenace</a></h1>
+	<div class="site-description"><h2>Linux, technology, opensource etc.</h2><nav class="nav social">
+			<ul class="flat"></ul>
+		</nav>
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/about">About</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post-header">
+			<h1 class="title">A Simple Tcp Server in Erlang</h1>
+			<div class="meta">Posted at &mdash; Jan 21, 2016</div>
+		</div>
+
+		<div class="markdown">
+			<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang">-<span style="color:#cb4b16">module</span>(tcpserver).
+-<span style="color:#cb4b16">export</span>([ start<span style="color:#719e07">/</span><span style="color:#2aa198">0</span>, start<span style="color:#719e07">/</span><span style="color:#2aa198">1</span>, stop<span style="color:#719e07">/</span><span style="color:#2aa198">0</span> ]).
+
+<span style="color:#268bd2">start</span>() -&gt;
+	<span style="color:#cb4b16">start</span>(<span style="color:#2aa198">9090</span>).
+
+<span style="color:#268bd2">start</span>(<span style="color:#268bd2">Port</span>) -&gt;
+	F = <span style="color:#cb4b16">fun</span>() -&gt;
+				<span style="color:#cb4b16">register</span>(tcpserver, <span style="color:#268bd2">self</span>()),
+				{ok, <span style="color:#268bd2">LSock</span>} <span style="color:#719e07">=</span> gen_tcp:<span style="color:#268bd2">listen</span>(<span style="color:#268bd2">Port</span>, [binary]),
+				io:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;====&gt; TcpServer listening on localhost, port </span><span style="color:#2aa198">~p~n~n</span><span style="color:#2aa198">&#34;</span>, [<span style="color:#268bd2">Port</span>]),
+				<span style="color:#b58900">spawn</span>(<span style="color:#719e07">fun</span>() -&gt; <span style="color:#cb4b16">loop</span>(<span style="color:#268bd2">LSock</span>) <span style="color:#719e07">end</span>),
+				<span style="color:#719e07">receive</span>
+					stop -&gt;
+						<span style="color:#cb4b16">exit</span>(killed)
+				<span style="color:#719e07">end</span>
+		<span style="color:#719e07">end</span>,
+	<span style="color:#268bd2">Pid</span> <span style="color:#719e07">=</span> <span style="color:#b58900">spawn</span>(<span style="color:#268bd2">F</span>).
+
+<span style="color:#268bd2">loop</span>(<span style="color:#268bd2">LSock</span>) -&gt;
+	{<span style="color:#cb4b16">ok</span>, <span style="color:#268bd2">Sock</span>} <span style="color:#719e07">=</span> gen_tcp:<span style="color:#268bd2">accept</span>(<span style="color:#268bd2">LSock</span>),
+	<span style="color:#b58900">spawn</span>(<span style="color:#719e07">fun</span>() -&gt; <span style="color:#cb4b16">loop</span>(<span style="color:#268bd2">LSock</span>) <span style="color:#719e07">end</span>),
+	<span style="color:#268bd2">get_data</span>(<span style="color:#268bd2">Sock</span>).
+
+<span style="color:#268bd2">get_data</span>(<span style="color:#268bd2">Sock</span>) -&gt;
+	<span style="color:#cb4b16">receive</span>
+		{tcp_closed, <span style="color:#268bd2">Sock</span>} -&gt;
+			<span style="color:#cb4b16">ok</span>;
+		{tcp, <span style="color:#268bd2">Sock</span>, <span style="color:#268bd2">Data</span>} -&gt;
+			R<span style="color:#cb4b16">es</span> <span style="color:#719e07">=</span> <span style="color:#b58900">list_to_binary</span>(lists:<span style="color:#268bd2">flatten</span>(io_lib:<span style="color:#268bd2">fwrite</span>(<span style="color:#2aa198">&#34;You said: </span><span style="color:#2aa198">~p~n</span><span style="color:#2aa198">&#34;</span>, [<span style="color:#268bd2">Data</span>]))),
+			gen_tcp:<span style="color:#b58900">send</span>(<span style="color:#268bd2">Sock</span>, <span style="color:#268bd2">Res</span>),
+			<span style="color:#268bd2">get_data</span>(<span style="color:#268bd2">Sock</span>)
+	<span style="color:#719e07">end</span>.
+
+
+<span style="color:#268bd2">stop</span>() -&gt;
+	<span style="color:#cb4b16">whereis</span>(tcpserver) <span style="color:#719e07">!</span> stop.</code></pre></div>
+<p>Run:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">1&gt; tcpserver:start().
+====&gt; TcpServer listening on localhost, port 9090
+
+&lt;0.396.0&gt;</pre></div>
+<p>Test:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">$ telnet 127.0.0.1 9090
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is &#39;^]&#39;.
+hello
+You said: &lt;&lt;&#34;hello\r\n&#34;&gt;&gt;
+hey!
+You said: &lt;&lt;&#34;hey!\r\n&#34;&gt;&gt;
+this is cool!!
+You said: &lt;&lt;&#34;this is cool!!\r\n&#34;&gt;&gt;</pre></div>
+		</div>
+
+		<div class="post-tags">
+			
+				
+			
+		</div>
+		</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div> <a href="https://github.com/vividvilla/ezhil">Ezhil theme</a> | Built with <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div>
+
+
+
+
+</body>
+</html>

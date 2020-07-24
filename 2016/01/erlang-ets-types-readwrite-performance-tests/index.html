@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Erlang Ets Types Readwrite Performance Tests - Technomenace</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title" content="Erlang Ets Types Readwrite Performance Tests" />
+<meta property="og:description" content="ETS read/write performance tests.
+-module(ets_try2). -import(lists, [foldl/3, reverse/1]). -export([ match_times_test/0 ]). %% ==================================================================== %% API functions %% ====================================================================  match_times_test() -&gt; io:format(&#34;==&gt; Fetching GPL License v3." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.technomenace.com/2016/01/erlang-ets-types-readwrite-performance-tests/" />
+
+
+
+<meta property="article:published_time" content="2016-01-29T00:24:37&#43;05:30"/>
+
+<meta property="article:modified_time" content="2016-01-29T00:24:37&#43;05:30"/>
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Erlang Ets Types Readwrite Performance Tests"/>
+<meta name="twitter:description" content="ETS read/write performance tests.
+-module(ets_try2). -import(lists, [foldl/3, reverse/1]). -export([ match_times_test/0 ]). %% ==================================================================== %% API functions %% ====================================================================  match_times_test() -&gt; io:format(&#34;==&gt; Fetching GPL License v3."/>
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,300italic,400italic|Raleway:200,300" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://www.technomenace.com/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://www.technomenace.com/css/main.css" />
+
+	
+	<script src="https://www.technomenace.com/js/main.js"></script>
+</head>
+
+<body>
+	<div class="container wrapper post">
+		<div class="header">
+	<base href="https://www.technomenace.com/">
+	<h1 class="site-title"><a href="https://www.technomenace.com/">Technomenace</a></h1>
+	<div class="site-description"><h2>Linux, technology, opensource etc.</h2><nav class="nav social">
+			<ul class="flat"></ul>
+		</nav>
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/about">About</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post-header">
+			<h1 class="title">Erlang Ets Types Readwrite Performance Tests</h1>
+			<div class="meta">Posted at &mdash; Jan 29, 2016</div>
+		</div>
+
+		<div class="markdown">
+			<p>ETS read/write performance tests.</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-erlang" data-lang="erlang">-<span style="color:#cb4b16">module</span>(ets_try2).
+-<span style="color:#cb4b16">import</span>(lists, [foldl<span style="color:#719e07">/</span><span style="color:#2aa198">3</span>, reverse<span style="color:#719e07">/</span><span style="color:#2aa198">1</span>]).
+-<span style="color:#cb4b16">export</span>([ match_times_test<span style="color:#719e07">/</span><span style="color:#2aa198">0</span> ]).
+
+<span style="color:#586e75">%% ====================================================================
+</span><span style="color:#586e75">%% API functions
+</span><span style="color:#586e75">%% ====================================================================
+</span><span style="color:#586e75"></span>
+<span style="color:#268bd2">match_times_test</span>() -&gt;
+	<span style="color:#cb4b16">io</span>:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;==&gt; Fetching GPL License v3.0 text ....       &#34;</span>),
+	<span style="color:#268bd2">Data</span> <span style="color:#719e07">=</span> <span style="color:#268bd2">get_gpl_license</span>(),
+	io:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;DONE!</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>),
+	<span style="color:#268bd2">WordList</span> <span style="color:#719e07">=</span> <span style="color:#268bd2">fetch_all_words</span>(<span style="color:#268bd2">Data</span>),
+	<span style="color:#268bd2">InsertList</span> <span style="color:#719e07">=</span> <span style="color:#268bd2">reverse</span>(<span style="color:#268bd2">foldl</span>(<span style="color:#719e07">fun</span>(<span style="color:#268bd2">Wrd</span>, <span style="color:#268bd2">Acc</span>) -&gt; [ { W<span style="color:#cb4b16">rd</span> , <span style="color:#b58900">length</span>(<span style="color:#268bd2">Acc</span>) <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span> } | <span style="color:#268bd2">Acc</span>] <span style="color:#719e07">end</span>, [], <span style="color:#268bd2">WordList</span>)),
+
+	<span style="color:#268bd2">Test</span> <span style="color:#719e07">=</span> <span style="color:#719e07">fun</span>(<span style="color:#268bd2">TbType</span>, <span style="color:#268bd2">TbName</span>) -&gt;
+				    <span style="color:#cb4b16">garbage_collect</span>(),
+				   	<span style="color:#268bd2">Tb</span> <span style="color:#719e07">=</span> <span style="color:#268bd2">create_ets_test_table</span>(<span style="color:#268bd2">TbType</span>, <span style="color:#268bd2">TbName</span>),
+				   	{<span style="color:#268bd2">InsertTime</span>, _} <span style="color:#719e07">=</span> timer:<span style="color:#268bd2">tc</span>(<span style="color:#719e07">fun</span>() -&gt; [<span style="color:#cb4b16">ets</span>:<span style="color:#268bd2">insert</span>(<span style="color:#268bd2">Tb</span>, <span style="color:#268bd2">Rec</span>) || <span style="color:#268bd2">Rec</span> <span style="color:#719e07">&lt;</span>- I<span style="color:#cb4b16">nsertList</span>] <span style="color:#719e07">end</span>),
+				   	<span style="color:#268bd2">TbSize</span> <span style="color:#719e07">=</span> ets:<span style="color:#268bd2">info</span>(<span style="color:#268bd2">Tb</span>, <span style="color:#b58900">size</span>),
+					
+					<span style="color:#268bd2">RandKeys</span> <span style="color:#719e07">=</span> [<span style="color:#2aa198">&#34;program&#34;</span>, <span style="color:#2aa198">&#34;should&#34;</span>, <span style="color:#2aa198">&#34;GNU&#34;</span>, <span style="color:#2aa198">&#34;see&#34;</span>, <span style="color:#2aa198">&#34;interactive&#34;</span>,
+									<span style="color:#2aa198">&#34;the&#34;</span>, <span style="color:#2aa198">&#34;please&#34;</span>, <span style="color:#2aa198">&#34;type&#34;</span>, <span style="color:#2aa198">&#34;even&#34;</span>, <span style="color:#2aa198">&#34;and&#34;</span>],
+					<span style="color:#268bd2">LookupFn</span> <span style="color:#719e07">=</span> <span style="color:#719e07">fun</span>() -&gt;
+										T = <span style="color:#cb4b16">foldl</span>(<span style="color:#719e07">fun</span>(<span style="color:#268bd2">Key</span>, <span style="color:#268bd2">Acc</span>) -&gt; {T<span style="color:#cb4b16">t</span>, _} <span style="color:#719e07">=</span> timer:<span style="color:#268bd2">tc</span>(ets, lookup, [<span style="color:#268bd2">Tb</span>, <span style="color:#268bd2">Key</span>]), <span style="color:#268bd2">Tt</span> <span style="color:#719e07">+</span> <span style="color:#268bd2">Acc</span> <span style="color:#719e07">end</span>, <span style="color:#2aa198">0</span>, <span style="color:#268bd2">RandKeys</span>),
+										<span style="color:#268bd2">T</span> <span style="color:#719e07">/</span> <span style="color:#2aa198">10</span>
+										<span style="color:#719e07">end</span>,
+					
+					{<span style="color:#268bd2">ReadTime</span>, _} <span style="color:#719e07">=</span> timer:<span style="color:#268bd2">tc</span>(<span style="color:#719e07">fun</span>() -&gt; <span style="color:#cb4b16">traverse_through_all_records</span>(<span style="color:#268bd2">Tb</span>) <span style="color:#719e07">end</span>),
+					
+					<span style="color:#268bd2">LookupTime</span> <span style="color:#719e07">=</span> <span style="color:#268bd2">LookupFn</span>(),
+	
+					<span style="color:#268bd2">Type</span> <span style="color:#719e07">=</span> ets:<span style="color:#268bd2">info</span>(<span style="color:#268bd2">Tb</span>, type),
+					<span style="color:#268bd2">Size</span> <span style="color:#719e07">=</span> ets:<span style="color:#268bd2">info</span>(<span style="color:#268bd2">Tb</span>, <span style="color:#b58900">size</span>),
+					<span style="color:#268bd2">Memory</span> <span style="color:#719e07">=</span> ets:<span style="color:#268bd2">info</span>(<span style="color:#268bd2">Tb</span>, <span style="color:#b58900">memory</span>),
+					io:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">==&gt; Information regarding ets table &#39;</span><span style="color:#2aa198">~p</span><span style="color:#2aa198">&#39; :-</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>, [<span style="color:#268bd2">TbName</span>]),
+					io:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Type: </span><span style="color:#2aa198">~p</span><span style="color:#2aa198"> , # of Records: </span><span style="color:#2aa198">~p</span><span style="color:#2aa198"> , Total Memory: </span><span style="color:#2aa198">~p</span><span style="color:#2aa198">, Words/Rec: </span><span style="color:#2aa198">~f~n</span><span style="color:#2aa198">&#34;</span>, 
+							  [<span style="color:#268bd2">Type</span>, <span style="color:#268bd2">Size</span>, <span style="color:#268bd2">Memory</span>, <span style="color:#268bd2">Memory</span><span style="color:#719e07">/</span><span style="color:#268bd2">Size</span>]),
+					
+					
+					io:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Time taken to insert data      : </span><span style="color:#2aa198">~f</span><span style="color:#2aa198"> ms/record</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>, [<span style="color:#268bd2">InsertTime</span> <span style="color:#719e07">/</span> <span style="color:#268bd2">TbSize</span>]),
+					io:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;Time taken to traverse through : </span><span style="color:#2aa198">~f</span><span style="color:#2aa198"> ms/record</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>, [<span style="color:#268bd2">ReadTime</span> <span style="color:#719e07">/</span> <span style="color:#268bd2">TbSize</span>]),
+					io:<span style="color:#268bd2">format</span>(<span style="color:#2aa198">&#34;(Avg) Time for lookup/2 fn     : </span><span style="color:#2aa198">~f</span><span style="color:#2aa198"> ms</span><span style="color:#2aa198">~n</span><span style="color:#2aa198">&#34;</span>, [<span style="color:#268bd2">LookupTime</span>]),
+					ets:<span style="color:#268bd2">delete</span>(<span style="color:#268bd2">Tb</span>)
+				   <span style="color:#719e07">end</span>,
+	
+	<span style="color:#268bd2">Test</span>(set, setTb), 						<span style="color:#586e75">%% set
+</span><span style="color:#586e75"></span>	<span style="color:#268bd2">Test</span>(ordered_set, orderedsetTb), 		<span style="color:#586e75">%% ordered_set
+</span><span style="color:#586e75"></span>	<span style="color:#268bd2">Test</span>(bag, bagTb),				 		<span style="color:#586e75">%% ordered_set
+</span><span style="color:#586e75"></span>	<span style="color:#268bd2">Test</span>(duplicate_bag, duplicatebagTb). 	<span style="color:#586e75">%% ordered_set
+</span><span style="color:#586e75"></span>	
+	
+
+
+<span style="color:#586e75">%% ====================================================================
+</span><span style="color:#586e75">%% Internal functions
+</span><span style="color:#586e75">%% ====================================================================
+</span><span style="color:#586e75"></span>
+<span style="color:#268bd2">traverse_through_all_records</span>(<span style="color:#268bd2">TableId</span>) -&gt;
+	L<span style="color:#cb4b16">oop</span> <span style="color:#719e07">=</span> <span style="color:#719e07">fun</span> <span style="color:#268bd2">Loop</span>(_<span style="color:#268bd2">TableId</span>, &#39;$end_of_table&#39;) -&gt; <span style="color:#cb4b16">ok</span>;
+			   <span style="color:#268bd2">Loop</span>(<span style="color:#268bd2">TableId</span>, <span style="color:#268bd2">Key</span>) -&gt; 
+					L<span style="color:#cb4b16">oop</span>(<span style="color:#268bd2">TableId</span>, ets:<span style="color:#268bd2">next</span>(<span style="color:#268bd2">TableId</span>, <span style="color:#268bd2">Key</span>))
+		   <span style="color:#719e07">end</span>,
+					
+	<span style="color:#719e07">case</span> ets:<span style="color:#268bd2">first</span>(<span style="color:#268bd2">TableId</span>) <span style="color:#719e07">of</span>
+		&#39;$end_of_table&#39; -&gt; <span style="color:#cb4b16">ok</span>;
+		<span style="color:#268bd2">Key</span> -&gt; L<span style="color:#cb4b16">oop</span>(<span style="color:#268bd2">TableId</span>, <span style="color:#268bd2">Key</span>)
+	<span style="color:#719e07">end</span>.
+
+<span style="color:#268bd2">get_gpl_license</span>() -&gt;
+	<span style="color:#cb4b16">application</span>:<span style="color:#268bd2">start</span>(inets),
+	{ok, <span style="color:#268bd2">Res</span>} <span style="color:#719e07">=</span> httpc:<span style="color:#268bd2">request</span>(<span style="color:#2aa198">&#34;http://www.gnu.org/licenses/gpl-3.0.txt&#34;</span>),
+	{_, _, <span style="color:#268bd2">Body</span>} <span style="color:#719e07">=</span> <span style="color:#268bd2">Res</span>,
+	application:<span style="color:#268bd2">stop</span>(inets),
+	<span style="color:#268bd2">Body</span>.
+
+<span style="color:#268bd2">create_ets_test_table</span>(<span style="color:#268bd2">Type</span>, <span style="color:#268bd2">TableName</span>) -&gt; 
+	T<span style="color:#cb4b16">ableId</span> <span style="color:#719e07">=</span> ets:<span style="color:#268bd2">new</span>(<span style="color:#268bd2">TableName</span>, [<span style="color:#268bd2">Type</span>]),
+	<span style="color:#268bd2">TableId</span>.
+
+<span style="color:#268bd2">fetch_all_words</span>(<span style="color:#268bd2">Body</span>) -&gt;
+	<span style="color:#cb4b16">fetch_all_words</span>(<span style="color:#268bd2">Body</span>, []).
+
+<span style="color:#268bd2">fetch_all_words</span>([], <span style="color:#268bd2">Acc</span>) -&gt;
+	<span style="color:#cb4b16">reverse</span>(<span style="color:#268bd2">Acc</span>);
+<span style="color:#268bd2">fetch_all_words</span>(<span style="color:#268bd2">Body</span>, <span style="color:#268bd2">Acc</span>) -&gt;
+	{W<span style="color:#cb4b16">ord</span>, <span style="color:#268bd2">Rest</span>} <span style="color:#719e07">=</span> <span style="color:#268bd2">fetch_next_word</span>(<span style="color:#268bd2">Body</span>),
+	<span style="color:#719e07">case</span> <span style="color:#268bd2">Word</span> <span style="color:#719e07">of</span>
+		[] -&gt; <span style="color:#cb4b16">fetch_all_words</span>(<span style="color:#268bd2">Rest</span>, <span style="color:#268bd2">Acc</span>);
+		_ -&gt; <span style="color:#cb4b16">fetch_all_words</span>(<span style="color:#268bd2">Rest</span>, [<span style="color:#268bd2">Word</span> | <span style="color:#268bd2">Acc</span>])
+	<span style="color:#719e07">end</span>.
+
+<span style="color:#268bd2">fetch_next_word</span>(<span style="color:#268bd2">Body</span>) -&gt;
+	<span style="color:#cb4b16">fetch_next_word</span>(<span style="color:#268bd2">Body</span>, []).
+
+<span style="color:#268bd2">fetch_next_word</span>([<span style="color:#2aa198">$\s</span>|<span style="color:#268bd2">T</span>], <span style="color:#268bd2">Acc</span>)	-&gt; {<span style="color:#cb4b16">reverse</span>(<span style="color:#268bd2">Acc</span>), <span style="color:#268bd2">T</span>};
+<span style="color:#268bd2">fetch_next_word</span>([<span style="color:#2aa198">$\r</span>|<span style="color:#268bd2">T</span>], <span style="color:#268bd2">Acc</span>)	-&gt; {<span style="color:#cb4b16">reverse</span>(<span style="color:#268bd2">Acc</span>), <span style="color:#268bd2">T</span>};
+<span style="color:#268bd2">fetch_next_word</span>([<span style="color:#2aa198">$\n</span>|<span style="color:#268bd2">T</span>], <span style="color:#268bd2">Acc</span>)	-&gt; {<span style="color:#cb4b16">reverse</span>(<span style="color:#268bd2">Acc</span>), <span style="color:#268bd2">T</span>};
+<span style="color:#268bd2">fetch_next_word</span>([<span style="color:#2aa198">$\t</span>|<span style="color:#268bd2">T</span>], <span style="color:#268bd2">Acc</span>)	-&gt; {<span style="color:#cb4b16">reverse</span>(<span style="color:#268bd2">Acc</span>), <span style="color:#268bd2">T</span>};
+<span style="color:#268bd2">fetch_next_word</span>([$\.|<span style="color:#268bd2">T</span>], <span style="color:#268bd2">Acc</span>)	-&gt; {<span style="color:#cb4b16">reverse</span>(<span style="color:#268bd2">Acc</span>), <span style="color:#268bd2">T</span>};
+<span style="color:#268bd2">fetch_next_word</span>([<span style="color:#268bd2">H</span>|<span style="color:#268bd2">T</span>], <span style="color:#268bd2">Acc</span>)		-&gt; <span style="color:#cb4b16">fetch_next_word</span>(<span style="color:#268bd2">T</span>, [<span style="color:#268bd2">H</span>|<span style="color:#268bd2">Acc</span>]);
+<span style="color:#268bd2">fetch_next_word</span>([], <span style="color:#268bd2">Acc</span>)		-&gt; {<span style="color:#cb4b16">reverse</span>(<span style="color:#268bd2">Acc</span>), []}.
+
+% <span style="color:#268bd2">EOF</span></code></pre></div>
+<p>Run:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">1&gt; ets_try2:match_times_test().
+==&gt; Fetching GPL License v3.0 text ....       DONE!
+
+==&gt; Information regarding ets table &#39;setTb&#39; :-
+Type: set , # of Records: 1486 , Total Memory: 31821, Words/Rec: 21.413863
+Time taken to insert data      : 1.250336 ms/record
+Time taken to traverse through : 0.423284 ms/record
+(Avg) Time for lookup/2 fn     : 1.200000 ms
+
+==&gt; Information regarding ets table &#39;orderedsetTb&#39; :-
+Type: ordered_set , # of Records: 1486 , Total Memory: 33097, Words/Rec: 22.272544
+Time taken to insert data      : 2.591521 ms/record
+Time taken to traverse through : 0.421938 ms/record
+(Avg) Time for lookup/2 fn     : 1.700000 ms
+
+==&gt; Information regarding ets table &#39;bagTb&#39; :-
+Type: bag , # of Records: 5654 , Total Memory: 97749, Words/Rec: 17.288468
+Time taken to insert data      : 2.165900 ms/record
+Time taken to traverse through : 0.196675 ms/record
+(Avg) Time for lookup/2 fn     : 13.600000 ms
+
+==&gt; Information regarding ets table &#39;duplicatebagTb&#39; :-
+Type: duplicate_bag , # of Records: 5654 , Total Memory: 97749, Words/Rec: 17.288468
+Time taken to insert data      : 0.885037 ms/record
+Time taken to traverse through : 0.225327 ms/record
+(Avg) Time for lookup/2 fn     : 14.400000 ms
+true</pre></div>
+		</div>
+
+		<div class="post-tags">
+			
+				
+			
+		</div>
+		</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div> <a href="https://github.com/vividvilla/ezhil">Ezhil theme</a> | Built with <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Technomenace</title>
+    <link>https://www.technomenace.com/posts/</link>
+    <description>Recent content in Posts on Technomenace</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 29 Jan 2016 00:24:37 +0530</lastBuildDate>
+    
+	<atom:link href="https://www.technomenace.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Erlang Ets Types Readwrite Performance Tests</title>
+      <link>https://www.technomenace.com/2016/01/erlang-ets-types-readwrite-performance-tests/</link>
+      <pubDate>Fri, 29 Jan 2016 00:24:37 +0530</pubDate>
+      
+      <guid>https://www.technomenace.com/2016/01/erlang-ets-types-readwrite-performance-tests/</guid>
+      <description>ETS read/write performance tests.
+-module(ets_try2). -import(lists, [foldl/3, reverse/1]). -export([ match_times_test/0 ]). %% ==================================================================== %% API functions %% ====================================================================  match_times_test() -&amp;gt; io:format(&amp;#34;==&amp;gt; Fetching GPL License v3.</description>
+    </item>
+    
+    <item>
+      <title>A Simple Tcp Server in Erlang</title>
+      <link>https://www.technomenace.com/2016/01/a-simple-tcp-server-in-erlang/</link>
+      <pubDate>Thu, 21 Jan 2016 00:49:44 +0530</pubDate>
+      
+      <guid>https://www.technomenace.com/2016/01/a-simple-tcp-server-in-erlang/</guid>
+      <description>-module(tcpserver). -export([ start/0, start/1, stop/0 ]). start() -&amp;gt; start(9090). start(Port) -&amp;gt; F = fun() -&amp;gt; register(tcpserver, self()), {ok, LSock} = gen_tcp:listen(Port, [binary]), io:format(&amp;#34;====&amp;gt; TcpServer listening on localhost, port ~p~n~n&amp;#34;, [Port]), spawn(fun() -&amp;gt; loop(LSock) end), receive stop -&amp;gt; exit(killed) end end, Pid = spawn(F).</description>
+    </item>
+    
+    <item>
+      <title>Receive Messages With Priority in Erlang</title>
+      <link>https://www.technomenace.com/2016/01/receive-messages-with-priority-in-erlang/</link>
+      <pubDate>Sun, 10 Jan 2016 00:53:53 +0530</pubDate>
+      
+      <guid>https://www.technomenace.com/2016/01/receive-messages-with-priority-in-erlang/</guid>
+      <description>-module(spawntest). -export([ start/0, test/0	]). start() -&amp;gt; register(?MODULE, spawn(fun() -&amp;gt; myfun() end)). myfun() -&amp;gt; receive {P, critical, Msg} -&amp;gt; do_critical(P, Msg) after 0 -&amp;gt; receive {P, critical, Msg} -&amp;gt; do_critical(P, Msg); {P, Any} -&amp;gt; do_normal(P, Any) end end, myfun().</description>
+    </item>
+    
+    <item>
+      <title>Simple Gen_fsm Example</title>
+      <link>https://www.technomenace.com/2015/11/simple-gen_fsm-example/</link>
+      <pubDate>Mon, 16 Nov 2015 00:57:47 +0530</pubDate>
+      
+      <guid>https://www.technomenace.com/2015/11/simple-gen_fsm-example/</guid>
+      <description>My ongoing journey in the wonderful world of Erlang has been with the help of 2 books. I started off with Learn You Some Erlang For Good which is surely the best beginner guide you can ever get on Erlang language.</description>
+    </item>
+    
+  </channel>
+</rss>

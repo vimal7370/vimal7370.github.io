@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://www.technomenace.com/about/</loc>
+    <lastmod>2020-07-24T01:12:19+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/2016/01/erlang-ets-types-readwrite-performance-tests/</loc>
+    <lastmod>2016-01-29T00:24:37+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/2016/01/a-simple-tcp-server-in-erlang/</loc>
+    <lastmod>2016-01-21T00:49:44+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/2016/01/receive-messages-with-priority-in-erlang/</loc>
+    <lastmod>2016-01-10T00:53:53+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/2015/11/simple-gen_fsm-example/</loc>
+    <lastmod>2015-11-16T00:57:47+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/tags/erlang/</loc>
+    <lastmod>2015-11-16T00:57:47+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/tags/gen_fsm/</loc>
+    <lastmod>2015-11-16T00:57:47+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/posts/</loc>
+    <lastmod>2016-01-29T00:24:37+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/tags/</loc>
+    <lastmod>2015-11-16T00:57:47+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.technomenace.com/</loc>
+    <lastmod>2020-07-24T01:12:19+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>
